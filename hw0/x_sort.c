@@ -1,5 +1,5 @@
 # include <stdio.h>
-
+#include <stdlib.h>
 // A simple program to sort an array of integers in C
 
 /* YOUR WORK HERE */
@@ -7,10 +7,14 @@
 // Input: An array of integers and its length
 // Output: Nothing
 // Side Effect: The input array is sorted from least to greatest
-void sort(int *arr, int len)
-{
-	print("hello\n") ;
-	return;
+
+int cmpfunc (const void * a, const void * b) {
+   return ( *(int*)a - *(int*)b );
+}
+
+void sort(int *arr, int len){
+	qsort(arr, len, sizeof(int), cmpfunc );
+
 }
 
 /* END YOUR WORK */

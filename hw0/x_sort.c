@@ -8,13 +8,59 @@
 // Output: Nothing
 // Side Effect: The input array is sorted from least to greatest
 
-int cmpfunc (const void * a, const void * b) {
-   return ( *(int*)a - *(int*)b );
+// A utility function to get maximum value in arr[]
+int getMax(int arr[], int n)
+{
+    int mx = arr[0];
+	// an integer, mx, is initialized as the first element of the passed array
+    for (int i = 1; i < n; i++)
+        if (arr[i] > mx)
+            mx = arr[i];
+    return mx;
+	// iterates over the array, constantly updating the bigggest vaule until it runs out of array
 }
 
-void sort(int *arr, int len){
-	qsort(arr, len, sizeof(int), cmpfunc );
+// A function to do counting sort of arr[] according to
+// the digit represented by exp.
+void countSort(int arr[], int n, int exp)
+{
+    // output array
+    int output[n];
+    int i, count[10] = { 0 };
 
+    // Store count of occurrences in count[]
+    for (i = 0; i < n; i++)
+        count[(arr[i] / exp) % 10]++;
+
+    // Change count[i] so that count[i] now contains actual
+    // position of this digit in output[]
+    for (i = 1; i < 10; i++)
+        count[i] += count[i - 1];
+
+    // Build the output array
+    for (i = n - 1; i >= 0; i--) {
+        output[count[(arr[i] / exp) % 10] - 1] = arr[i];
+        count[(arr[i] / exp) % 10]--;
+    }
+
+    // Copy the output array to arr[], so that arr[] now
+    // contains sorted numbers according to current digit
+    for (i = 0; i < n; i++)
+        arr[i] = output[i];
+}
+
+// The main function to that sorts arr[] of size n using
+// Radix Sort
+void sort(int arr[], int n)
+{
+    // Find the maximum number to know number of digits
+    int m = getMax(arr, n);
+
+    // Do counting sort for every digit. Note that instead
+    // of passing digit number, exp is passed. exp is 10^i
+    // where i is current digit number
+    for (int exp = 1; m / exp > 0; exp *= 10)
+        countSort(arr, n, exp);
 }
 
 /* END YOUR WORK */

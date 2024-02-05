@@ -1,5 +1,5 @@
 # include <stdio.h>
-#include <stdlib.h>
+# include <stdlib.h>
 // A simple program to sort an array of integers in C
 
 /* YOUR WORK HERE */
@@ -24,6 +24,9 @@ int getMax(int arr[], int n)
 
 // A function to do counting sort of arr[] according to
 // the digit represented by exp.
+
+// pretty sure that means exp is the value representing decimal place
+// so that radix sort can later say "do count sort on the 1s, 10s, 100s," ect
 void countSort(int arr[], int n, int exp)
 {
     // output array

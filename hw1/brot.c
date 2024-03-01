@@ -77,12 +77,25 @@ double complex b2c(int size, int x, int y)
 
 // in C we accept a complex value, and integer number of iterations, and returns with an int that represents whether c escapes, or exceeds absolute value 2 in iters applications of m_seq.
 // I included the absolute value sample code
+
+// okay this should be easy. just run m_seq iters times and check if its greater than 2
 int escapes(double complex c, int iters)
-{
-	return abs(c) > 2;
-}
+{	double complex z_n = c;
+	int i = 0;
+	for (i=0; i < iters ; i++)
+	{
+		z_n = m_seq(z_n, c);
+		if (abs(z_n) > 2)
+		{
+			return 1;
+		}
+	}
+	return 0;
+} //were just gonna say one means "yes it escapes" and zero means "we're cool"
 
 // in C, we accept a 3d array base, an integer for size and for iterations, a color channel of 0,1,2, and a complex value c
+
+// work on escapes first i think
 void one_val(unsigned char ***base, int size, int iters, int color, double complex c)
 {
 	return;
@@ -134,6 +147,9 @@ void make_brot(int size, int iters)
 int main()
 {
 	create_base(20);
+	double complex sample_complex = 0.5 + 1.9 * I;
+	int test_escape = escapes(sample_complex, 2);
+	printf("%i/n", test_escape);
 	//make_brot(4000,50);
 	return 0;
 }

@@ -31,6 +31,8 @@ unsigned char ***create_base(int size)
 	}
 	//the array should be of unsinged char *s, each of which point to an unsinged char **, each of which
 
+
+	// THIS MAY BE FUCKED UP AND I MIGHT NEED ANOTHER LAYER??
 	return base_x;
 }
 
@@ -57,10 +59,21 @@ void c2b(double complex c, int size, int *x, int *y)
 
 	// creal() returns the real component of a complex number
 	// cimag() returns the imaginary component of a complex number
-	*x = 0;
-	*y = 0;
-	*x = creal(c);
-	*y = cimag(c);
+	//*x = 0;
+	//*y = 0;
+
+
+	// i think it takes size as a way of taking height and width bcs the image is always a square
+	// but i also think the whole base is supposed to be from -2 to 2 in both real and imaginary dimensions, no matter the size of the base
+
+	*x = (creal(c) + 2) * size / 2;
+	*y = (cimag(c) + 2) * size / 2;
+
+	// the above was adapted from the following code, found here: https://github.com/mcfunley/buddhabrot/blob/master/buddhabrot.c
+	// I dropped the int cast because im not sure what it was doing, but maybe ill have to add it back in, idk
+
+   // *x = (int)((creal(z) + 2) * b->width / 3);
+   // *y = (int)((cimag(z) + 1) * b->height / 2);
 
 	return;
 }
@@ -70,15 +83,25 @@ void c2b(double complex c, int size, int *x, int *y)
 // I've included sample code to work with complex values.
 double complex b2c(int size, int x, int y)
 {
-	double a = 0, b = 0;
-	double complex r = a + b * I;
+
+	// okay so x and y ought to give you indicies (after some massaging to make sure they fit the base probably?)
+	// like, .5 + .5i
+
+
+	//double a = 0, b = 0;
+	double complex r = (x * 4 / size - 2) + ((y * 4 / size - 2) * I);
 	return r;
+	// does this make sense? Not to me.
+	// does it draw errors? Not yet!
+
+
+
 }
 
 // in C we accept a complex value, and integer number of iterations, and returns with an int that represents whether c escapes, or exceeds absolute value 2 in iters applications of m_seq.
 // I included the absolute value sample code
 
-// okay this should be easy. just run m_seq iters times and check if its greater than 2
+// okay this should be easy. just run m_seq  iters times and check if its greater than 2
 int escapes(double complex c, int iters)
 {	double complex z_n = c;
 	int i = 0;
@@ -87,24 +110,77 @@ int escapes(double complex c, int iters)
 		z_n = m_seq(z_n, c);
 		if (abs(z_n) > 2)
 		{
-			return 1;
+			return 1; // True, value escapes within iters
 		}
 	}
-	return 0;
+	return 0; // False, stays bounded
 } //were just gonna say one means "yes it escapes" and zero means "we're cool"
 
 // in C, we accept a 3d array base, an integer for size and for iterations, a color channel of 0,1,2, and a complex value c
 
-// work on escapes first i think
+	/**
+	nothing is returned but the base itself might get fucked with. somehow.
+	i think this descriptiuon should still be good:
+# Description:
+# Take a value c.
+# If it escapes within iters
+# Go through the escaping sequence and increment
+# the pixel value for each location passed through by the
+# sequence for the given color.
+ */
+
 void one_val(unsigned char ***base, int size, int iters, int color, double complex c)
 {
-	return;
-}
+	// "if it escapes within iters"
+	// escapes already calls m_seq, no need to do it here
+	if (escapes(c, iters) == 0)
+	{
+		return; // if it doesnt escape, thats the mandelbrot set, thats not what were doing here
+	}	// SIDENOTE COME BACK TO THIS TO MAKE A NORMAL MANDELBROT RENDERER BY SWITCHING THIS LATER
+	else
+	{ // so if it escapes:
+		// okay so escapes only tells you if it escapes -- we still have c and can iterate on it ourselves
+		// methinks this seems like a lot of wasted work but what do i know
 
-// in C, we accept a 3d array base, an integer for size and for iterations
-void get_colors(unsigned char ***base, int size, int iters)
-{
+		//okay so "go through the escaping sequence -- meaning m_seq until abs(c>2) or something like that
+		// "incrememnt the pixel value) -- THE FINAL ARRAY POINTED TO BY THE Y POINTER FOR THE COLOR GIVEN TO US
+		// okay so im literally just gonna steal the escapes code and add some stuff on to it
+		int i = 0;
+		int *x, *y;
+		for (i=0; i < iters ; i++)
+		{
+			c2b(c, size, x, y); // this populates those pointers we just made up with coordinate data
+			// now i just need to "follow" those x y pointers to point at the color array
+			// ... i am not sure how to do that
+
+			/**
+			________________________________________
+			/ TODO: ASK CALVIN HOW TO FOLLOW THE X Y \
+			\ POINTERS TOMORROW IN CLASS             /
+			----------------------------------------
+					\   ^__^
+					\   (oo)\_______
+						(__)\       )\/\
+							||----w |
+							||     ||
+ */
+		}
+
+
+			// all this below stuff is the escapes code, not finished refactoring yet
+/**
+			z_n = m_seq(z_n, c);
+			if (abs(z_n) > 2)
+			{
+				return 1; // True, value escapes within iters
+			}
+		}
+		return 0; // False, stays bounded
+		}
+
+*/
 	return;
+	}
 }
 
 // OPTIONAL

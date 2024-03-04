@@ -43,7 +43,7 @@ def c2b(c,size):
 # reverse c2b
 def b2c(x,y,size):
 	return complex((x * 4.0 / size - 2.0), (y * 4.0 / size - 2.0))
-	
+	##okay this is (for some fucking reason) returning a tuple with the real and imaginary components seperately. I dont like that.
 # Name:  Escapes?
 # In:  a complex value c, a number of iterations i
 # Out:  a boolean

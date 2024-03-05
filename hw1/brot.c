@@ -7,19 +7,11 @@
 
 // In C, we make a 3 dimension unsigned char array of size * size * 3
 // Hint - how many times should loop? How many times should you call malloc?
-
 //okay so each entry will be a [size, size, o to 3]
-
 //you can treat a mallocced region as an array of characters
-
-// square thre real and imag components then compare to
-
-
 unsigned char ***create_base(int size)
 {
 	int i, j, k;
-	// go through, make the first array of length size and type unsigned char
-	// go through, make the n element of the first array its own array of size size
 
 
 	unsigned char ***base_x = malloc(sizeof(unsigned char **) * size);
@@ -27,10 +19,14 @@ unsigned char ***create_base(int size)
 
 	for (i=0; i < size; i++)
 	{
-		unsigned char **base_y = malloc(sizeof(unsigned char *) * size);
+		base_x[i] = malloc(sizeof(unsigned char *) * size);
 		for (j=0; j < size; j++)
 		{
-			unsigned char *base_color = malloc(sizeof(unsigned char) * 3);
+			base_x[i][j] = malloc(sizeof(unsigned char) * 3);
+			for (k=0; k < 3; k++)
+			{
+				base_x[i][j][k] = 0;
+			}
 		}
 	}
 	//the array should be of unsinged char *s, each of which point to an unsinged char **, each of which
@@ -60,44 +56,11 @@ double complex m_seq(double complex z_n, double complex c)
 // "output" means return the pointers after theyve been modified
 void c2b(double complex c, int size, int *x, int *y)
 {
+
+	*x = (creal(c) + 2) * size / 2;
+	*y = (cimag(c) + 4) * size / 2;
 	printf("got to c2b\n");
 	fflush(stdout);
-	*x = 1;
-	//y = 0;
-
-	printf("xptr: %p\n",x);
-	fflush(stdout);
-		/**
-
-	// i think it takes size as a way of taking height and width bcs the image is always a square
-	// but i also think the whole base is supposed to be from -2 to 2 in both real and imaginary dimensions, no matter the size of the base
-	printf("got to c2b pre math\n");
-
-	//okay its segfaulting here EXACTLY. why.
-
-	printf("creal: %lf\n", creal(c));
-	printf("cimag: %lf\n", cimag(c));
-	//printf("creal plus two times size over two: %i\n", (int)(cimag(c) + 2) * size / 2);
-
-
-	//*x = (int)(creal(c) + 2) * size / 2;
-	*x = 1;
-	// it seems like its having trouble populating the pointer with that value
-
-	printf("got past x pointer");
-	fflush(stdout);
-	*y = (int)(cimag(c) + 4) * size / 2;
-	printf("got to c2b post math\n");
-
-	// the above was adapted from the following code, found here: https://github.com/mcfunley/buddhabrot/blob/master/buddhabrot.c
-	// I dropped the int cast because im not sure what it was doing, but maybe ill have to add it back in, idk
-
-   // *x = (int)((creal(z) + 2) * b->width / 3);
-   // *y = (int)((cimag(z) + 1) * b->height / 2);
-
-
-
-	*/
 	return;
 }
 
@@ -107,11 +70,6 @@ void c2b(double complex c, int size, int *x, int *y)
 double complex b2c(int size, int x, int y)
 {
 
-	// okay so x and y ought to give you indicies (after some massaging to make sure they fit the base probably?)
-	// like, .5 + .5i
-
-
-	//double a = 0, b = 0;
 	double complex r = ((x * 4 / size - 2) + ((y * 4 / size - 2) * I));
 	return r;
 	// does this make sense? Not to me.
@@ -140,10 +98,7 @@ int escapes(double complex c, int iters)
 } //were just gonna say one means "yes it escapes" and zero means "we're cool"
 
 // in C, we accept a 3d array base, an integer for size and for iterations, a color channel of 0,1,2, and a complex value c
-
 	/**
-	nothing is returned but the base itself might get fucked with. somehow.
-	i think this descriptiuon should still be good:
 # Description:
 # Take a value c.
 # If it escapes within iters
@@ -156,37 +111,36 @@ void one_val(unsigned char ***base, int size, int iters, int color, double compl
 {
 	// "if it escapes within iters"
 	// escapes already calls m_seq, no need to do it here
-
-	printf("got to oneval\n");
+	printf("got to one val\n");
 	if (escapes(c, iters) == 0)
 	{
-		printf("got to oneval if\n");
 
 		return; // if it doesnt escape, thats the mandelbrot set, thats not what were doing here
 	}	// SIDENOTE COME BACK TO THIS TO MAKE A NORMAL MANDELBROT RENDERER BY SWITCHING THIS LATER
 	else
 	{
-		printf("got to oneval else\n");
+		printf("got to else \n");
 		// so if it escapes:
 		// okay so escapes only tells you if it escapes -- we still have c and can iterate on it ourselves
 		// methinks this seems like a lot of wasted work but what do i know
 
 		//okay so "go through the escaping sequence -- meaning m_seq until abs(c>2) or something like that
 		// "incrememnt the pixel value) -- THE FINAL ARRAY POINTED TO BY THE Y POINTER FOR THE COLOR GIVEN TO US
-		// okay so im literally just gonna steal the escapes code and add some stuff on to it
 		int i = 0;
-		int* x = 0;
-		int* y = 0;
-		// make pointers for x and y and stick zeroes in there
+		int x, y;
 
+		printf("got past x y assignment \n");
 		for (i=0; i < iters ; i++)
 		{
-
-			c2b(c, size, x, y); // this populates those pointers we just made up with coordinate data
-
+			// the ampersands mean "the pointer to x"
+			c2b(c, size, &x, &y);
 			// use the ints at *x and *y as indicies in base
-			printf("got past c2b call in oneval");
-			base[*x][*y][color] = base[*x][*y][color + 1];
+
+			// CURRENT BASTARD ZONE
+			printf("%i\n", base[x][y][0]);
+			printf("Got to the bastard zone");
+			fflush(stdout);
+			base[x][y][0] ++;
 		}
 
 	return;

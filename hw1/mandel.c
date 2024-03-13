@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <complex.h>
- 
+
 // rip from https://rosettacode.org/wiki/Bitmap/Write_a_PPM_file#C
 // try "convert x.ppm x.png" and follow the install instructions to get a png
 
@@ -61,14 +61,13 @@ double complex m_seq(double complex z_n, double complex c)
 // "output" means return the pointers after theyve been modified
 void c2b(double complex c, int size, int *x, int *y)
 {
-	//printf("got to c2b\n");
-	//fflush(stdout);
+
 	*x = (creal(c) + 2) * size / 4;
 	*y = (cimag(c) + 2) * size / 4;
-	printf("got past pointer assignment in c2b\n");
-	//fflush(stdout);
+
 	// HEY REMEMBER THAT THOSE USED TO BE DIVIDED BY 2. MAYBE THAT WAS FOR A REASON IDK
 
+	//printf("got to c2b\n");
 	return;
 }
 
@@ -100,7 +99,6 @@ int escapes(double complex c, int iters)
 		z_n = m_seq(z_n, c);
 		if ((creal(z_n)*creal(z_n)) + (cimag(z_n)*cimag(z_n)) >= 4) // custom thing that avoids a call to cabs. does the same thing though.
 		{
-			printf("value in buddhabrot! \n");
 			return 1; // True, value escapes within iters
 		}
 	}
@@ -121,55 +119,22 @@ void one_val(unsigned char ***base, int size, int iters, int color, double compl
 {
 	// "if it escapes within iters"
 	// escapes already calls m_seq, no need to do it here
-	printf("Entering one_val ...\n");
-	double complex og_c = c;
-	if (escapes(og_c, iters) == 0)
+	//printf("Entering one_val ...\n");
+	if (escapes(c, iters) == 1)
 	{
 		return; // if it doesnt escape, thats the mandelbrot set, thats not what were doing here
 	}	// SIDENOTE COME BACK TO THIS TO MAKE A NORMAL MANDELBROT RENDERER BY SWITCHING THIS LATER
 	else
 	{
-		//printf("got to else \n");
-		// so if it escapes:
-		// okay so escapes only tells you if it escapes -- we still have c and can iterate on it ourselves
-		// methinks this seems like a lot of wasted work but what do i know
-
-		//okay so "go through the escaping sequence -- meaning m_seq until abs(c>2) or something like that
-		// "incrememnt the pixel value) -- THE FINAL ARRAY POINTED TO BY THE Y POINTER FOR THE COLOR GIVEN TO US
-		int i = 0;
 		int x, y;
-		double complex z_n = og_c;
-		color = 0;
-		//printf("got past x y initialization \n");
-		for (i=0; i < iters ; i++)
-		{
-			printf("z_n real, imaginary: (%lf, %lf * I)\n At iteration %i\n", creal(z_n), cimag(z_n), i);
 
-			// the ampersands mean "the pointer to x"
-			c2b(z_n, size, &x, &y);
-			// use the ints at *x and *y as indicies in base
-			printf("Incrementing color at: %p, %p... \n", base[x], base[x][y]);
-			fflush(stdout);
-			// TEMP
-			base[x][y][color] = base[x][y][color] + (color * 70) + 10;
-			if (color > 2)
-			{
-				color = 0;
-			}
-			printf("Iterating... \n");
-			z_n = m_seq(z_n, og_c);
-			if ((creal(z_n)*creal(z_n)) + (cimag(z_n)*cimag(z_n)) >= 4)
-			{	//basically "if the value has gone shooting off to god knows where, dont put that in our array next round"
-				printf("Value escaped at iteration %i; Value was %lf + %lf * I\n", i, creal(z_n), cimag(z_n));
-
-				break;
-			}
-
-		}
-	return;
+			c2b(c, size, &x, &y);
+			base[x][y][0] = base[x][y][0] + 255;
+			base[x][y][1] = base[x][y][1] + 255;
+			base[x][y][2] = base[x][y][2] + 255;
 	}
+	return;
 }
-
 // OPTIONAL
 // That said, you images will look bad without this.
 // The Python sample had a hacky solution.
@@ -184,18 +149,6 @@ void equalize(unsigned char ***base, int size)
 // I'm leaving the ppm code
 void make_brot(int size, int iters)
 {
-	/**
-	 * okay so to make a buddhabrot you need to:
-	 * 1. Make a base with size size
-	 * 2. iterate over every "entry" in that base and get complex numbers from those base entries using b2c
-	 * 3. plug that complex number into one_val
-	 * 		PROBLEM: No color val given. multiple solutions; you could assign them randomly, or in sequence, or based on how fast it escapes, or whatever
-	 * 4. once you get to the end of the base, take the base and do some wizardry to make it a ppm
-	 * 5. then do some more wizardry to make it a png.
-	 *
-	 *  easy!
-	 *
-	*/
 	// creates the base, stores it in a triple pointer named base
 	unsigned char ***base = create_base(size);
 	// initializes c
@@ -209,22 +162,14 @@ void make_brot(int size, int iters)
 		for (j=0; j<size; j++)
 		{
 			int b2c_y = j;
-			// gets the value c at x y
-			printf("\ncurrent x, y: %i %i\n", i, j);
+			printf("current x, y: %i %i\n", i, j);
 			c = b2c(size, b2c_x, b2c_y);
-			printf("current complex: %lf + %lf * I\n", creal(c), cimag(c));
-			// we're just gonna set color to 2 for the moment to make it blue
-
 			one_val(base, size, iters, color_picker_value, c);
-			color_picker_value ++;
-			if (color_picker_value > 2)
-			{
-				color_picker_value = 0;
-			}
+
 		}
 	}
 
-	FILE *fp = fopen("brot.ppm", "wb"); /* b - binary mode */
+	FILE *fp = fopen("mandel.ppm", "wb"); /* b - binary mode */
 	fprintf(fp, "P6\n%d %d\n255\n", size, size);
 	static unsigned char color[3];
 
@@ -258,9 +203,9 @@ int main()
 	//test brot:
 	//make_brot(500,20);
 
-	make_brot(3000,50);
+	//make_brot(2000,50);
 
 	//deeply stupid, do not use:
-	//make_brot(20000, 200);
+	make_brot(22000, 50);
 	return 0;
 }

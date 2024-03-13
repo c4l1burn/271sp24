@@ -29,10 +29,8 @@ unsigned char ***create_base(int size)
 			}
 		}
 	}
-	//the array should be of unsinged char *s, each of which point to an unsinged char **, each of which
 
 
-	// THIS MAY BE FUCKED UP AND I MIGHT NEED ANOTHER LAYER??
 	return base_x;
 }
 
@@ -43,13 +41,7 @@ unsigned char ***create_base(int size)
 // Hint - don't use exponentiation
 double complex m_seq(double complex z_n, double complex c)
 {
-	//double a = 0, b = 0;
-	//double complex r = a + b * I;
-	//printf("mseq z_n: %lf, mseq c: %lf\n", z_n, c);
-	//fflush(stdout);
 	double complex r = (z_n * z_n) + c;
-	//printf("mseq z_n + 1: %lf\n", r);
-	//fflush(stdout);
 
 	return r;
 }
@@ -61,12 +53,9 @@ double complex m_seq(double complex z_n, double complex c)
 // "output" means return the pointers after theyve been modified
 void c2b(double complex c, int size, int *x, int *y)
 {
-	//printf("got to c2b\n");
-	//fflush(stdout);
 	*x = (creal(c) + 2) * size / 4;
 	*y = (cimag(c) + 2) * size / 4;
 	printf("got past pointer assignment in c2b\n");
-	//fflush(stdout);
 	// HEY REMEMBER THAT THOSE USED TO BE DIVIDED BY 2. MAYBE THAT WAS FOR A REASON IDK
 
 	return;
@@ -81,8 +70,6 @@ double complex b2c(int size, int x, int y)
 		// wweeeeeiiiiiirrrd
 	//printf("b2c result real component: %lf \n", creal(r));
 	//printf("b2c result imaginary component: %lf \n", cimag(r));
-	//((x * 4.0 / size - 2.0), (y * 4.0 / size - 2.0))
-	//printf("b2c result: \n", r);
 	return r;
 	// does this make sense? Not to me.
 	// does it draw errors? Not yet!
@@ -135,12 +122,10 @@ void one_val(unsigned char ***base, int size, int iters, int color, double compl
 		// methinks this seems like a lot of wasted work but what do i know
 
 		//okay so "go through the escaping sequence -- meaning m_seq until abs(c>2) or something like that
-		// "incrememnt the pixel value) -- THE FINAL ARRAY POINTED TO BY THE Y POINTER FOR THE COLOR GIVEN TO US
 		int i = 0;
 		int x, y;
 		double complex z_n = og_c;
 		color = 0;
-		//printf("got past x y initialization \n");
 		for (i=0; i < iters ; i++)
 		{
 			printf("z_n real, imaginary: (%lf, %lf * I)\n At iteration %i\n", creal(z_n), cimag(z_n), i);
@@ -150,7 +135,7 @@ void one_val(unsigned char ***base, int size, int iters, int color, double compl
 			// use the ints at *x and *y as indicies in base
 			printf("Incrementing color at: %p, %p... \n", base[x], base[x][y]);
 			fflush(stdout);
-			// TEMP
+			// Temp color solution bcs i cannot be bothered
 			base[x][y][color] = base[x][y][color] + (color * 70) + 10;
 			if (color > 2)
 			{
@@ -177,6 +162,7 @@ void one_val(unsigned char ***base, int size, int iters, int color, double compl
 // You equalized images in CS 151 ImageShop.
 void equalize(unsigned char ***base, int size)
 {
+	// absolutely not
 	return;
 }
  
@@ -202,7 +188,6 @@ void make_brot(int size, int iters)
 	double complex c;
 	// b2c takes size and an x and y coord. set x to i, set y to j
 	int i, j;
-	int color_picker_value = 0;
 	for (i=0; i<size; i++)
 	{
 		int b2c_x = i;
@@ -213,14 +198,10 @@ void make_brot(int size, int iters)
 			printf("\ncurrent x, y: %i %i\n", i, j);
 			c = b2c(size, b2c_x, b2c_y);
 			printf("current complex: %lf + %lf * I\n", creal(c), cimag(c));
-			// we're just gonna set color to 2 for the moment to make it blue
+			// we're just gonna set color to 2 for the moment to make it predominantly green
 
-			one_val(base, size, iters, color_picker_value, c);
-			color_picker_value ++;
-			if (color_picker_value > 2)
-			{
-				color_picker_value = 0;
-			}
+			one_val(base, size, iters, 1, c);
+
 		}
 	}
 
@@ -243,20 +224,11 @@ void make_brot(int size, int iters)
 	return;
 }
 
-// core learning obj of buddhabrot: get you to maintain an array representing the complex plane
 
  
 int main()
 {
-	// a bunch of test code i dont quite wanna throw out yet:
 
-	//create_base(20);
-	//double complex sample_complex = 0.5 + 1.9 * I;
-	//int test_escape = escapes(sample_complex, 2);
-	//printf("%i/n", test_escape);
-
-	//test brot:
-	//make_brot(500,20);
 
 	make_brot(3000,50);
 

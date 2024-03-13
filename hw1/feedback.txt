@@ -1,3 +1,17 @@
+EDIT:
+
+Preserving these notes because they might be neat. I regraded the correct version and have a single comment:
+
+
+	*x = (creal(c) + 2) * size / 4; // should probably be (int)((creal(c) + 2.0) * (double)size / 4.0))
+
+100/100
+
+Great job!
+
+Legacy comments:
+
+
 It's good you talked to Indi whose a pro.
 
 I made a number of changes to your code to get it to run, show anything, and remove some obvious errors arising from misunderstanding C types. Here's the diff:
